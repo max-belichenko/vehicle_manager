@@ -1,7 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
-from rest_framework.urlpatterns import format_suffix_patterns
 
 from api import views
 
@@ -17,5 +16,3 @@ urlpatterns = [
     path('vehicles/', views.VehicleList.as_view()),
     path('vehicles/<int:pk>/', views.VehicleDetail.as_view()),
 ]
-
-urlpatterns = format_suffix_patterns(urlpatterns)

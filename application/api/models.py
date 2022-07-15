@@ -87,13 +87,22 @@ class Vehicle(models.Model):
         verbose_name_plural = 'Транспортные средства'
 
 
+DATA_OPERATIONS_MAPPING = {
+    'import': 'import',
+    'export': 'export',
+    'add': 'add',
+    'modify': 'modify',
+    'remove': 'remove',
+    'get': 'get',
+}
+
 DATA_OPERATIONS = [
-    ('import', 'Импорт'),
-    ('export', 'Экспорт'),
-    ('add', 'Добавить'),
-    ('modify', 'Изменить'),
-    ('remove', 'Удалить'),
-    ('get', 'Получить'),
+    (DATA_OPERATIONS_MAPPING['import'], 'Импорт'),
+    (DATA_OPERATIONS_MAPPING['export'], 'Экспорт'),
+    (DATA_OPERATIONS_MAPPING['add'], 'Добавить'),
+    (DATA_OPERATIONS_MAPPING['modify'], 'Изменить'),
+    (DATA_OPERATIONS_MAPPING['remove'], 'Удалить'),
+    (DATA_OPERATIONS_MAPPING['get'], 'Получить'),
 ]
 
 

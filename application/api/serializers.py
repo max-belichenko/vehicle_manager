@@ -1,6 +1,5 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
-from rest_framework.request import Request
 
 from api.exceptions import VehicleAPIException
 from api.models import Vehicle, DataLog

@@ -18,9 +18,9 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class VehicleSerializer(serializers.ModelSerializer):
-    # Переопределить сериализацию некоторых полей
-    created_by = serializers.SlugRelatedField(read_only=True, slug_field='username', )  # Отображать username вместо id
-    updated_by = serializers.SlugRelatedField(read_only=True, slug_field='username', )  # Отображать username вместо id
+    # Переопределить сериализацию полей
+    created_by = serializers.SlugRelatedField(read_only=True, slug_field='username', )
+    updated_by = serializers.SlugRelatedField(read_only=True, slug_field='username', )
 
     def create(self, validated_data):
         """
@@ -71,8 +71,8 @@ class VehicleSerializer(serializers.ModelSerializer):
 
 
 class DataLogSerializer(serializers.ModelSerializer):
-    # Переопределить сериализацию некоторых полей
-    created_by = serializers.SlugRelatedField(read_only=True, slug_field='username', )  # Отображать username вместо id
+    # Переопределить сериализацию полей
+    created_by = serializers.SlugRelatedField(read_only=True, slug_field='username', )
 
     def create(self, validated_data):
         """

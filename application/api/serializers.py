@@ -91,7 +91,7 @@ class DataLogSerializer(serializers.ModelSerializer):
         return DataLog.objects.create(**validated_data)
 
     class Meta:
-        model = Vehicle
+        model = DataLog
         fields = ['id', 'created_at', 'created_by', 'vehicle_id', 'registration_number', 'vin',
                   'vehicle_certificate_number', 'operation', 'description', ]
         read_only_fields = ['id', 'created_at', 'created_by', 'vehicle_id', 'registration_number', 'vin',

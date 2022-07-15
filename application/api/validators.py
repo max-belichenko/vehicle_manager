@@ -27,7 +27,7 @@ class ExactLengthValidator(BaseValidator):
     code = "exact_length"
 
     def compare(self, a, b):
-        return a == b
+        return a != b
 
     def clean(self, x):
         return len(x)

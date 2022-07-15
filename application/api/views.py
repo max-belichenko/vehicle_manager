@@ -83,7 +83,7 @@ def log_data_modification(vehicle: dict, username: str, operation: str, descript
             created_by=username,
             operation=operation,
             description=description,
-            vehicle_id=vehicle['vehicle_id'],
+            vehicle_id=vehicle['id'],
             registration_number=vehicle['registration_number'],
             vin=vehicle['vin'],
             vehicle_certificate_number=vehicle['vehicle_certificate_number'],

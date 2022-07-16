@@ -1,12 +1,7 @@
-import datetime
-
 from django.core.exceptions import ValidationError
 from django.core.validators import BaseValidator
 
-
-def get_current_year():
-    """ Returns current year. """
-    return datetime.date.today().year
+from utils.validators import get_current_year
 
 
 def MaxCurrentYearValidator(value: int):

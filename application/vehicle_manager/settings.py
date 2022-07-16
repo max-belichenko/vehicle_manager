@@ -11,9 +11,11 @@ from settings.logger import LOGGER_CONFIGUARTION
 logging.config.dictConfig(LOGGER_CONFIGUARTION)
 
 
+# Build application base directory
 BASE_DIR = Path(__file__).resolve().parent.parent   # Build paths inside the project like this: BASE_DIR / 'subdir'.
 
 
+# Set parameters according to environment
 if app_settings.environment == EnvironmentEnum.production:
     DEBUG = False
     SECRET_KEY = app_settings.secret_key
@@ -30,6 +32,7 @@ else:
     DEBUG = app_settings.debug
     SECRET_KEY = 'django-insecure-b+!gfy$rn_0w@$r7$z%55goevq3g#2z4f-y&4k3$ns=u_#^eo('
     ALLOWED_HOSTS = ['.localhost', '127.0.0.1', '[::1]']
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',

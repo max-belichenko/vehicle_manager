@@ -5,7 +5,7 @@ from utils.validators import get_current_year
 
 
 def MaxCurrentYearValidator(value: int):
-    """ Validates that value is less or equal than current year. """
+    """ Проверяет, что указанный год меньше или равен текущему году. """
     current_year = get_current_year()
 
     if value > current_year:
@@ -16,7 +16,7 @@ def MaxCurrentYearValidator(value: int):
 
 
 class ExactLengthValidator(BaseValidator):
-    """ Validates that value string of exactly specified length. """
+    """ Проверяет, что строка имеет ровно указанную длину. """
 
     message = "Строка должна содержать ровно %(limit_value)d символов."
     code = "exact_length"

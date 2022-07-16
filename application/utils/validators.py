@@ -2,5 +2,5 @@ import datetime
 
 
 def get_current_year():
-    """ Returns current year. """
+    """ Возвращает нынешний год. """
     return datetime.date.today().year

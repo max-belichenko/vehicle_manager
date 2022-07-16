@@ -53,7 +53,6 @@ class VehicleList(generics.ListCreateAPIView):
 
         if filters:
             queryset = queryset.filter(**filters)
-            logging.debug(f'{filters=}')
 
         return queryset
 

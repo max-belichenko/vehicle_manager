@@ -13,7 +13,7 @@ class ApplicationSettings(BaseSettings):
     debug: Optional[bool] = False
     secret_key: str
     allowed_hosts: list[str]
-    environment: Optional[EnvironmentEnum] = 'development'
+    environment: Optional[EnvironmentEnum] = EnvironmentEnum.development
 
     class Config:
         env_file = '.env'

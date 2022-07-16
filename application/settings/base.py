@@ -1,5 +1,5 @@
 from enum import Enum
-from pydantic import BaseSettings, Field
+from pydantic import BaseSettings
 from typing import Optional
 
 

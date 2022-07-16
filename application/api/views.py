@@ -23,112 +23,96 @@ class GroupViewSet(viewsets.ModelViewSet):
 
 
 class VehicleList(generics.ListCreateAPIView):
+    """ API: Просмотр списка транспортных средств; Создание новой записи о транспортном средстве. """
     queryset = Vehicle.objects.all()
     serializer_class = VehicleSerializer
 
     def post(self, request, *args, **kwargs):
+        # Создать новую запись
         response = self.create(request, *args, **kwargs)
+
+        # Записать в лог информацию о создании новой записи
         log_data_modification(
             vehicle=response.data,
             username=request.user,
             operation=DATA_OPERATIONS_MAPPING['add'],
             description='Создана новая запись о транспортном средстве.',
         )
+
         return response
 
     def perform_create(self, serializer):
+        """
+        Переопределяет функцию perform_create класса CreateModelMixin.
+
+        Внедряет данные, необходимые для создания новой записи.
+        """
         serializer.save(created_by=self.request.user, updated_by=self.request.user)
 
 
 class VehicleDetail(generics.RetrieveUpdateDestroyAPIView):
+    """ API: Просмотр выбранного транспортного средства; Редактирование и удаление записи о транспортном средстве. """
     queryset = Vehicle.objects.all()
     serializer_class = VehicleSerializer
 
     def put(self, request, *args, **kwargs):
+        # Получить обновляемую запись
         vehicle = self.get_object()
         vehicle_data = VehicleSerializer(vehicle).data
+
+        # Записать в лог информацию об обновлении существующей записи
         log_data_modification(
             vehicle=vehicle_data,
             username=request.user,
             operation=DATA_OPERATIONS_MAPPING['modify'],
             description='Изменена запись о транспортном средстве.',
         )
-        return self.update(request, *args, **kwargs)
+
+        # Обновить запись
+        response = self.update(request, *args, **kwargs)
+
+        return response
 
     def patch(self, request, *args, **kwargs):
+        # Получить обновляемую запись
         vehicle = self.get_object()
         vehicle_data = VehicleSerializer(vehicle).data
+
+        # Записать в лог информацию об обновлении существующей записи
         log_data_modification(
             vehicle=vehicle_data,
             username=request.user,
             operation=DATA_OPERATIONS_MAPPING['modify'],
             description='Изменена запись о транспортном средстве.',
         )
-        return self.partial_update(request, *args, **kwargs)
+
+        # Обновить запись
+        response = self.partial_update(request, *args, **kwargs)
+
+        return response
 
     def delete(self, request, *args, **kwargs):
+        # Получить удаляемую запись
         vehicle = self.get_object()
         vehicle_data = VehicleSerializer(vehicle).data
+
+        # Записать в лог информацию об обновлении существующей записи
         log_data_modification(
             vehicle=vehicle_data,
             username=request.user,
             operation=DATA_OPERATIONS_MAPPING['remove'],
             description='Удалена запись о транспортном средстве.',
         )
-        return self.destroy(request, *args, **kwargs)
+
+        # Удалить запись
+        response = self.destroy(request, *args, **kwargs)
+
+        return response
 
     def perform_update(self, serializer):
-        serializer.save(updated_by=self.request.user)
+        """
+        Переопределяет функцию perform_update класса UpdateModelMixin.
 
-#
-#
-# class VehicleList(APIView):
-#     """
-#     List all snippets, or create a new snippet.
-#     """
-#     def get(self, request):
-#         vehicles = Vehicle.objects.all()
-#         serializer = VehicleSerializer(vehicles, many=True)
-#         return Response(serializer.data)
-#
-#     def post(self, request):
-#         serializer = VehicleSerializer(data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             response = Response(serializer.data, status=status.HTTP_201_CREATED)
-#         else:
-#             response = Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-#
-#         return response
-#
-#
-# class VehicleDetail(APIView):
-#     """
-#     Retrieve, update or delete a snippet instance.
-#     """
-#     def get_object(self, pk):
-#         try:
-#             return Vehicle.objects.get(pk=pk)
-#         except Vehicle.DoesNotExist:
-#             raise Http404
-#
-#     def get(self, request, pk):
-#         vehicle = self.get_object(pk)
-#         serializer = VehicleSerializer(vehicle)
-#         return Response(serializer.data)
-#
-#     def put(self, request, pk):
-#         vehicle = self.get_object(pk)
-#         serializer = VehicleSerializer(vehicle, data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             response = Response(serializer.data)
-#         else:
-#             response = Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-#
-#         return response
-#
-#     def delete(self, request, pk):
-#         vehicle = self.get_object(pk)
-#         vehicle.delete()
-#         return Response(status=status.HTTP_204_NO_CONTENT)
+        Внедряет данные, необходимые для обновления существующей записи.
+        """
+        serializer.save(updated_by=self.request.user)

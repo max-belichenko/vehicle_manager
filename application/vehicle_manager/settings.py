@@ -1,8 +1,14 @@
+import logging
 import os
 
 from pathlib import Path
 
 from settings.base import settings as app_settings, EnvironmentEnum
+from settings.logger import LOGGER_CONFIGUARTION
+
+
+# Configure logging
+logging.config.dictConfig(LOGGER_CONFIGUARTION)
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent   # Build paths inside the project like this: BASE_DIR / 'subdir'.

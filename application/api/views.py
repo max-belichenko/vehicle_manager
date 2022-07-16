@@ -36,6 +36,9 @@ class VehicleList(generics.ListCreateAPIView):
         )
         return response
 
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user, updated_by=self.request.user)
+
 
 class VehicleDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Vehicle.objects.all()
@@ -73,6 +76,10 @@ class VehicleDetail(generics.RetrieveUpdateDestroyAPIView):
             description='Удалена запись о транспортном средстве.',
         )
         return self.destroy(request, *args, **kwargs)
+
+    def perform_update(self, serializer):
+        serializer.save(updated_by=self.request.user)
+
 #
 #
 # class VehicleList(APIView):

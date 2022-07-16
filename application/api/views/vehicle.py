@@ -1,9 +1,11 @@
+import logging
+
 from rest_framework import generics
 from rest_framework import permissions
 
 from api.models import Vehicle, DATA_OPERATIONS_MAPPING
 from api.serializers import VehicleSerializer
-from utils.views import log_data_modification
+from utils.views import log_data_modification, build_field_lookup
 
 
 class VehicleList(generics.ListCreateAPIView):
@@ -38,38 +40,20 @@ class VehicleList(generics.ListCreateAPIView):
         """ Реализует поиск данных по параметрам, переданным в запросе. """
         queryset = Vehicle.objects.all()
 
-        # Получить параметры фильтрации из запроса
-        make = self.request.query_params.get('make')
-        model = self.request.query_params.get('model')
-        color = self.request.query_params.get('color')
-        registration_number = self.request.query_params.get('registration_number')
-        year_of_manufacture = self.request.query_params.get('year_of_manufacture')
-        vin = self.request.query_params.get('vin')
-        vehicle_certificate_number = self.request.query_params.get('vehicle_certificate_number')
-        vehicle_certificate_date = self.request.query_params.get('vehicle_certificate_date')
-
         # Сформировать фильтры по параметрам запроса
         filters = dict()
-
-        if make is not None:
-            filters['make__icontains'] = make
-        if model is not None:
-            filters['model__icontains'] = model
-        if color is not None:
-            filters['color__icontains'] = color
-        if registration_number is not None:
-            filters['registration_number__iexact'] = registration_number
-        if year_of_manufacture is not None:
-            filters['year_of_manufacture'] = year_of_manufacture
-        if vin is not None:
-            filters['vin__iexact'] = vin
-        if vehicle_certificate_number is not None:
-            filters['vehicle_certificate_number__iexact'] = vehicle_certificate_number
-        if vehicle_certificate_date is not None:
-            filters['vehicle_certificate_date'] = vehicle_certificate_date
+        filters.update(build_field_lookup(request=self.request, parameter='make', filtering_method='icontains'))
+        filters.update(build_field_lookup(request=self.request, parameter='model', filtering_method='icontains'))
+        filters.update(build_field_lookup(request=self.request, parameter='color', filtering_method='icontains'))
+        filters.update(build_field_lookup(request=self.request, parameter='registration_number', filtering_method='iexact'))
+        filters.update(build_field_lookup(request=self.request, parameter='year_of_manufacture'))
+        filters.update(build_field_lookup(request=self.request, parameter='vin', filtering_method='iexact'))
+        filters.update(build_field_lookup(request=self.request, parameter='vehicle_certificate_number', filtering_method='iexact'))
+        filters.update(build_field_lookup(request=self.request, parameter='vehicle_certificate_date'))
 
         if filters:
             queryset = queryset.filter(**filters)
+            logging.debug(f'{filters=}')
 
         return queryset
 

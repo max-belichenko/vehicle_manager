@@ -55,7 +55,11 @@ def parse_vehicles(filename: str, data) -> list[dict]:
 
 
 def save_vehicle(data: dict, **kwargs) -> Vehicle:
-    print(f'Saving {data}')
+    """
+    Сохраняет информацию о транспортном средстве в базу данных.
+
+    Внедряет дополнительные поля из `kwargs` при сохранении.
+    """
     serializer = VehicleSerializer(data=data)
     if serializer.is_valid():
         try:
@@ -69,5 +73,4 @@ def save_vehicle(data: dict, **kwargs) -> Vehicle:
     else:
         raise VehicleAPIException(f'Некорректный формат данных: {serializer.errors}')
 
-    print(vehicle)
     return vehicle

@@ -17,7 +17,6 @@ def MaxCurrentYearValidator(value: int):
 
 class ExactLengthValidator(BaseValidator):
     """ Проверяет, что строка имеет ровно указанную длину. """
-
     message = "Строка должна содержать ровно %(limit_value)d символов."
     code = "exact_length"
 

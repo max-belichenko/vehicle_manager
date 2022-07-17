@@ -14,7 +14,6 @@ ENV PYTHONPATH="${PYTHONPATH}:$HOME"
 RUN mkdir -p $APP_HOME
 RUN groupadd -g $USER_ID -r $USER_NAME && \
     useradd -u $USER_ID -r -g $USER_NAME -d $HOME -s /sbin/nologin -c "Application user" $USER_NAME
-RUN chown -R $USER_NAME:$USER_NAME $HOME
 
 # Update system
 RUN apt-get update \
@@ -42,6 +41,8 @@ COPY .env $APP_HOME
 
 # Run DB migrations and create superuser
 WORKDIR $APP_HOME
+
+RUN chown -R $USER_NAME:$USER_NAME $HOME
 
 # Change user to `app`
 USER $USER_NAME

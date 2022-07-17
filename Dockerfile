@@ -48,7 +48,7 @@ RUN python3 manage.py migrate
 
 # !!! FOR DEMONSTRATION PURPOSE ONLY! REMOVE IN PRODUCTION !!!
 COPY create_superuser.sh .
-RUN chmod +x /create_superuser.sh
+RUN chmod +x create_superuser.sh
 RUN ./create_superuser.sh
 # !!! FOR DEMONSTRATION PURPOSE ONLY! REMOVE IN PRODUCTION !!!
 

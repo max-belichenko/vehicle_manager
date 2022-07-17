@@ -1,11 +1,10 @@
+import datetime
 import logging
-from typing import Optional
-
 import pandas
 
-from enum import Enum
-
 from django.db import DatabaseError
+from enum import Enum
+from typing import Optional
 
 from api.exceptions import VehicleAPIException
 from api.models import Vehicle
@@ -46,34 +45,50 @@ def read_data_to_dataframe(file_type: str, data) -> pandas.DataFrame:
         case 'xlsx':
             dataframe = pandas.read_excel(data, sheet_name=0, header=0, engine='openpyxl')
         case _:
-            raise ValueError(f'Формат файла {file_type} не поддерживается.')
+            error_message = f'Формат файла {file_type} не поддерживается.'
+            logging.error(error_message)
+            raise ValueError(error_message)
 
     return dataframe
 
 
 def parse_vehicles(file_type: str, data) -> list[dict]:
     """ Разбирает файл, содержащий информацию о транспортных средствах. """
+    logging.debug(f'parse_vehicles({file_type=}, {data=})')
+
     try:
         dataframe = read_data_to_dataframe(file_type, data)
     except ValueError as e:
-        raise VehicleAPIException(f'Не удалось преобразовать данные в DataFrame: {e}')
+        error_message = f'Не удалось преобразовать данные в DataFrame: {e}'
+        logging.error(error_message)
+        raise VehicleAPIException(error_message)
 
-    vehicles = []
-    for _, row in dataframe.iterrows():
-        vehicle = dict()
-        for item in FileHeadersEnum:
-            try:
-                # Изменить тип поля "Дата выдачи СТС" с `Timestamp` на `date` (т.к. Pandas трактует дату как Timestamp)
-                if item == FileHeadersEnum.vehicle_certificate_date and isinstance(row[item.value], pandas.Timestamp):
-                    value = row[item.value].date()
-                else:
-                    value = row[item.value]
-            except KeyError as e:
-                raise VehicleAPIException(f'Некорректный формат файла. Не найдена колонка данных: {e}')
-            vehicle[item.name] = value
-        vehicles.append(vehicle)
+    try:
+        vehicles = [
+            {item.name: row[item.value] for item in FileHeadersEnum}
+            for _, row in dataframe.iterrows()
+        ]
+    except KeyError as e:
+        error_message = f'Некорректный формат файла. Не найдена колонка данных: {e}'
+        logging.error(error_message)
+        raise VehicleAPIException(error_message)
 
     return vehicles
+
+
+def transform_vehicles(data: list[dict]) -> list[dict]:
+    """ Производит необходимые преобразования данных, подготавливая их к последующему сохранению в БД. """
+    logging.debug(f'transform_vehicles({data=})')
+
+    # Преобразовать тип данных для колонки 'Дата выдачи СТС' из Timestamp или datetime в date.
+    key = FileHeadersEnum.vehicle_certificate_date.name     # Соответствует колонке 'Дата выдачи СТС'
+    for item in data:
+        value = item[key]
+        if isinstance(value, (pandas.Timestamp, datetime.datetime)):
+            value = value.date()
+            item[key] = value
+
+    return data
 
 
 def save_vehicle(data: dict, **kwargs) -> Vehicle:
@@ -82,6 +97,8 @@ def save_vehicle(data: dict, **kwargs) -> Vehicle:
 
     Внедряет дополнительные поля из `kwargs` при сохранении.
     """
+    logging.debug(f'save_vehicle({data=})')
+
     serializer = VehicleSerializer(data=data)
     if serializer.is_valid():
         try:
@@ -93,6 +110,8 @@ def save_vehicle(data: dict, **kwargs) -> Vehicle:
             logging.error(error_message)
             raise VehicleAPIException(error_message)
     else:
-        raise VehicleAPIException(f'Некорректный формат данных: {serializer.errors}')
+        error_message = f'Некорректный формат данных: {serializer.errors}'
+        logging.error(error_message)
+        raise VehicleAPIException(error_message)
 
     return vehicle

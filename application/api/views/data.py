@@ -21,8 +21,13 @@ class ImportDataView(views.APIView):
     parser_classes = [FileUploadParser, ]
     permission_classes = [permissions.IsAuthenticated]
 
-    def put(self, request):
-        file_data = request.data['file']
+    def put(self, request, format=None):
+        try:
+            file_data = request.data['file']
+        except KeyError:
+            error_message = 'Отсутствует файл. Передайте файл для загрузки данных в теле запроса.'
+            logging.error(error_message)
+            raise VehicleAPIException(error_message)
 
         # Определить тип полученного файла
         try:

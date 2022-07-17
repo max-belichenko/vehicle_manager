@@ -25,7 +25,7 @@
 
 ```#shell
 cd vehicle_manager
-docker-compose up
+docker-compose up --build
 ```
 
 ### Docker

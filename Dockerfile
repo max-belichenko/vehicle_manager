@@ -32,7 +32,9 @@ RUN pip install -r requirements.txt
 
 # Copy application files
 RUN mkdir -p $APP_HOME
+WORKDIR $APP_HOME
 COPY application/ $APP_HOME
+
 # !!! NEXT LINE IS FOR DEMONSTRATION PURPOSE ONLY! REMOVE IN PRODUCTION !!!
 COPY .env $APP_HOME
 
@@ -55,7 +57,6 @@ RUN chown -R $USER_NAME:$USER_NAME $HOME
 
 # Set container state before launch application
 USER $USER_NAME
-WORKDIR $APP_HOME
 EXPOSE 8000
 
 # Set command to run when container starts

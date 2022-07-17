@@ -15,7 +15,6 @@ RUN mkdir -p $APP_HOME
 RUN groupadd -g $USER_ID -r $USER_NAME && \
     useradd -u $USER_ID -r -g $USER_NAME -d $HOME -s /sbin/nologin -c "Application user" $USER_NAME
 RUN chown -R $USER_NAME:$USER_NAME $HOME
-USER $USER_NAME
 
 # Update system
 RUN apt-get update \
@@ -37,6 +36,10 @@ RUN pip install -r requirements.txt
 # Copy application source files
 COPY application/ $APP_HOME
 
+# !!! FOR DEMONSTRATION PURPOSE ONLY! REMOVE IN PRODUCTION !!!
+COPY .env $APP_HOME
+# !!! FOR DEMONSTRATION PURPOSE ONLY! REMOVE IN PRODUCTION !!!
+
 # Run DB migrations and create superuser
 WORKDIR $APP_HOME
 
@@ -47,6 +50,9 @@ RUN python3 manage.py migrate
 COPY create_superuser.sh .
 RUN ./create_superuser.sh
 # !!! FOR DEMONSTRATION PURPOSE ONLY! REMOVE IN PRODUCTION !!!
+
+# Change user to `app`
+USER $USER_NAME
 
 # Show port that applications listens to
 EXPOSE 8000

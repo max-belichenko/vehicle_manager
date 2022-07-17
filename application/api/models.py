@@ -8,6 +8,22 @@ from api.validators import MaxCurrentYearValidator, ExactLengthValidator
 # Константы
 FIRST_CAR_MANUFACTURE_YEAR = 1886
 VIN_LENGTH = 17
+DATA_OPERATIONS_MAPPING = {
+    'import': 'import',
+    'export': 'export',
+    'add': 'add',
+    'modify': 'modify',
+    'remove': 'remove',
+    'get': 'get',
+}
+DATA_OPERATIONS = [
+    (DATA_OPERATIONS_MAPPING['import'], 'Импорт'),
+    (DATA_OPERATIONS_MAPPING['export'], 'Экспорт'),
+    (DATA_OPERATIONS_MAPPING['add'], 'Добавить'),
+    (DATA_OPERATIONS_MAPPING['modify'], 'Изменить'),
+    (DATA_OPERATIONS_MAPPING['remove'], 'Удалить'),
+    (DATA_OPERATIONS_MAPPING['get'], 'Получить'),
+]
 
 
 class Vehicle(models.Model):
@@ -85,25 +101,6 @@ class Vehicle(models.Model):
         ordering = ('make', 'model', )
         verbose_name = 'Транспортное средство'
         verbose_name_plural = 'Транспортные средства'
-
-
-DATA_OPERATIONS_MAPPING = {
-    'import': 'import',
-    'export': 'export',
-    'add': 'add',
-    'modify': 'modify',
-    'remove': 'remove',
-    'get': 'get',
-}
-
-DATA_OPERATIONS = [
-    (DATA_OPERATIONS_MAPPING['import'], 'Импорт'),
-    (DATA_OPERATIONS_MAPPING['export'], 'Экспорт'),
-    (DATA_OPERATIONS_MAPPING['add'], 'Добавить'),
-    (DATA_OPERATIONS_MAPPING['modify'], 'Изменить'),
-    (DATA_OPERATIONS_MAPPING['remove'], 'Удалить'),
-    (DATA_OPERATIONS_MAPPING['get'], 'Получить'),
-]
 
 
 class DataLog(models.Model):

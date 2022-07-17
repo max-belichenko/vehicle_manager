@@ -52,7 +52,7 @@ RUN python3 manage.py migrate
 
 # !!! FOR DEMONSTRATION PURPOSE ONLY! REMOVE IN PRODUCTION !!!
 COPY create_superuser.sh .
-RUN chmod +x create_superuser.sh
+# RUN chmod +x create_superuser.sh
 # Remove Windows characters:
 RUN sed -i -e 's/\r$//' create_superuser.sh
 RUN ./create_superuser.sh

@@ -19,7 +19,7 @@ RUN chown -R $USER_NAME:$USER_NAME $HOME
 # Update system
 RUN apt-get update \
     && apt-get upgrade -y \
-    && apt-get install -y gcc python3-dev libpq-dev git
+    && apt-get install -y gcc python3-dev libpq-dev git build-essential
 
 # Install Python, WSGI and required libraries
 WORKDIR $HOME

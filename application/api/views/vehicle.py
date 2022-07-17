@@ -1,8 +1,10 @@
 import logging
 
+import django_filters
 from rest_framework import generics
 from rest_framework import permissions
 
+from api.filters import vehicle_list_filter
 from api.models import Vehicle, DATA_OPERATIONS_MAPPING
 from api.serializers import VehicleSerializer
 from utils.views import log_data_modification, build_field_lookup
@@ -31,30 +33,13 @@ class VehicleList(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         """
         Переопределяет функцию perform_create класса CreateModelMixin.
-
         Внедряет данные, необходимые для создания новой записи.
         """
         serializer.save(created_by=self.request.user, updated_by=self.request.user)
 
     def get_queryset(self):
         """ Реализует поиск данных по параметрам, переданным в запросе. """
-        queryset = Vehicle.objects.all()
-
-        # Сформировать фильтры по параметрам запроса
-        filters = dict()
-        filters.update(build_field_lookup(request=self.request, parameter='make', filtering_method='icontains'))
-        filters.update(build_field_lookup(request=self.request, parameter='model', filtering_method='icontains'))
-        filters.update(build_field_lookup(request=self.request, parameter='color', filtering_method='icontains'))
-        filters.update(build_field_lookup(request=self.request, parameter='registration_number', filtering_method='iexact'))
-        filters.update(build_field_lookup(request=self.request, parameter='year_of_manufacture'))
-        filters.update(build_field_lookup(request=self.request, parameter='vin', filtering_method='iexact'))
-        filters.update(build_field_lookup(request=self.request, parameter='vehicle_certificate_number', filtering_method='iexact'))
-        filters.update(build_field_lookup(request=self.request, parameter='vehicle_certificate_date'))
-
-        if filters:
-            queryset = queryset.filter(**filters)
-
-        return queryset
+        return vehicle_list_filter(self.request)
 
 
 class VehicleDetail(generics.RetrieveUpdateDestroyAPIView):

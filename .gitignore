@@ -1,3 +1,6 @@
+# Custom ignore
+data/
+
 # PyCharm
 .idea/
 

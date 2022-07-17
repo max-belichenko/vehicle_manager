@@ -1,10 +1,14 @@
 import datetime
+import io
 import logging
 import pandas
 
 from django.db import DatabaseError
 from enum import Enum
 from typing import Optional
+
+from django.db.models import QuerySet
+from pandas import DataFrame
 
 from api.exceptions import VehicleAPIException
 from api.models import Vehicle
@@ -115,3 +119,45 @@ def save_vehicle(data: dict, **kwargs) -> Vehicle:
         raise VehicleAPIException(error_message)
 
     return vehicle
+
+
+def dataframe_to_xlsx_bytes(dataframe: DataFrame):
+    """ Преобразует данные из pandas.DataFrame в формат XLSX. Возвращает объект BytesIO. """
+    output = io.BytesIO()
+    writer = pandas.ExcelWriter(path=output, engine='xlsxwriter')
+    dataframe.to_excel(
+        excel_writer=writer,
+        sheet_name='Транспортные средства',
+        header=[field.value for field in FileHeadersEnum],
+        index=False,
+    )
+    writer.save()
+    xlsx_data = output.getvalue()
+
+    return xlsx_data
+
+
+def dataframe_to_csv(dataframe: DataFrame):
+    """ Преобразует данные из pandas.DataFrame в формат XLSX. Возвращает объект BytesIO. """
+    csv_data = dataframe.to_csv(
+        sep=';',
+        header=[field.value for field in FileHeadersEnum],
+        index=False,
+    )
+
+    return csv_data
+
+
+def export_vehicles(queryset: QuerySet, file_type: str):
+    """ """
+    field_names = [field.name for field in FileHeadersEnum]     # Выбрать только значимые для экспорта поля
+    values = queryset.values(*field_names)                      # Получить значения указанных полей
+    dataframe = pandas.DataFrame(list(values))                  # Сформировать DataFrame из полученных данных
+
+    match file_type:
+        case 'xlsx':
+            return dataframe_to_xlsx_bytes(dataframe)
+        case 'csv':
+            return dataframe_to_csv(dataframe)
+        case _:
+            raise ValueError(f'Тип данных {file_type} не поддерживается.')

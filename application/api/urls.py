@@ -7,7 +7,8 @@ from api.views.vehicle import VehicleList, VehicleDetail
 
 urlpatterns = [
     path('vehicles/', VehicleList.as_view()),
+    path('vehicles/import/', ImportDataView.as_view()),
+    # path('vehicles/export/', VehicleList.as_view()),
     path('vehicles/<int:pk>/', VehicleDetail.as_view()),
     path('logs/', DataLogView.as_view()),
-    path('import/<str:filename>', ImportDataView.as_view()),
 ]

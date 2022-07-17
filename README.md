@@ -13,6 +13,10 @@
 
 
 
+**[Документация](https://github.com/max-belichenko/vehicle_manager/blob/master/DOCUMENTATION.md)**
+
+
+
 ## Установка приложения
 
 `git clone https://github.com/max-belichenko/vehicle_manager.git`
@@ -48,3 +52,4 @@ python application\manage.py migrate
 python application\manage.py createsuperuser --email admin@example.com --username admin
 python application\manage.py runserver 0.0.0.0:8000
 ```
+

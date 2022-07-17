@@ -3,12 +3,13 @@ version: '3'
 services:
   backend:
     build:
-      context: ./blog_backend
-      args:
-        DJANGO_ALLOWED_HOSTS: *
-        DJANGO_SECRET_KEY: *
-        DJANGO_CORS_ORIGIN_WHITELIST: *
-    command: gunicorn vehicle_manager.wsgi --bind 0.0.0.0:8000
+      context: ./
+#      args:
+#        DJANGO_ALLOWED_HOSTS: *
+#        DJANGO_SECRET_KEY: *
+#        DJANGO_CORS_ORIGIN_WHITELIST: *
+#    command: gunicorn vehicle_manager.wsgi --bind 0.0.0.0:8000
+#    command: uwsgi --http :8000 --module vehicle_manager.wsgi
     ports:
       - "8000:8000"
   nginx:

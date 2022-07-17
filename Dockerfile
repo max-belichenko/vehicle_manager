@@ -43,6 +43,9 @@ COPY .env $APP_HOME
 # Run DB migrations and create superuser
 WORKDIR $APP_HOME
 
+# Change user to `app`
+USER $USER_NAME
+
 RUN python3 manage.py makemigrations
 RUN python3 manage.py migrate
 
@@ -53,9 +56,6 @@ RUN chmod +x create_superuser.sh
 RUN sed -i -e 's/\r$//' create_superuser.sh
 RUN ./create_superuser.sh
 # !!! FOR DEMONSTRATION PURPOSE ONLY! REMOVE IN PRODUCTION !!!
-
-# Change user to `app`
-USER $USER_NAME
 
 # Show port that applications listens to
 EXPOSE 8000

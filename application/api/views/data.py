@@ -8,13 +8,14 @@ from rest_framework.response import Response
 
 from api.exceptions import VehicleAPIException
 from api.filters import vehicle_list_filter
-from api.models import Vehicle
+from api.models import Vehicle, DATA_OPERATIONS_MAPPING
 from api.renderers import XLSXFileRenderer, CSVFileRenderer
 from api.serializers import VehicleSerializer
 from utils.data import (
     parse_vehicles, save_vehicle, file_type_from_content_type, CONTENT_TYPE_TO_FILE_TYPE_MAPPING,
     transform_vehicles, export_vehicles,
 )
+from utils.views import log_data_modification
 
 
 class ImportDataView(views.APIView):
@@ -22,6 +23,7 @@ class ImportDataView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def put(self, request, format=None):
+        # Получить передаваемый файлы
         try:
             file_data = request.data['file']
         except KeyError:
@@ -52,7 +54,16 @@ class ImportDataView(views.APIView):
 
         # Сохранить данные в БД
         for vehicle in vehicles:
-            save_vehicle(vehicle, created_by=request.user, updated_by=request.user)
+            vehicle_instance = save_vehicle(vehicle, created_by=request.user, updated_by=request.user)
+
+            # Записать в лог информацию об обновлении существующей записи
+            vehicle_data = VehicleSerializer(vehicle_instance).data
+            log_data_modification(
+                vehicle=vehicle_data,
+                username=request.user,
+                operation=DATA_OPERATIONS_MAPPING['import'],
+                description='Импортированы данные о транспортном средстве.',
+            )
 
         return Response(status=status.HTTP_201_CREATED)
 
@@ -77,25 +88,19 @@ class ExportDataView(generics.ListAPIView):
             logging.error(error_message)
             raise VehicleAPIException(detail=error_message)
 
-        match file_type:
-            case 'xls':
-                raise VehicleAPIException(detail=f'Выгрузка в формате {file_type} в данный момент не поддерживается.')
-            case 'xlsx':
-                data = export_vehicles(self.get_queryset(), file_type=file_type)
-                response = Response(
-                    data=data,
-                    headers={'Content-Disposition': 'attachment; filename="vehicles.xlsx"', },
-                    content_type=content_type,
-                )
-                return response
-            case 'csv':
-                data = export_vehicles(self.get_queryset(), file_type=file_type)
-                response = Response(
-                    data=data,
-                    headers={'Content-Disposition': 'attachment; filename="vehicles.csv"', },
-                    content_type=content_type,
-                )
-                return response
+        if file_type not in ('xlsx', 'csv'):
+            raise VehicleAPIException(detail=f'Выгрузка в формате {file_type} в данный момент не поддерживается.')
+
+        # Экспортировать данные
+        filename = f'vehicles.{file_type}'
+        data = export_vehicles(self.get_queryset(), file_type=file_type)
+        response = Response(
+            data=data,
+            headers={'Content-Disposition': f'attachment; filename="{filename}"', },
+            content_type=content_type,
+        )
+
+        return response
 
     def get_queryset(self):
         """ Реализует поиск данных по параметрам, переданным в запросе. """

@@ -1,5 +1,6 @@
 FROM python:3.10-slim
 
+# Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
@@ -10,57 +11,52 @@ ENV HOME=/home/$USER_NAME
 ENV APP_HOME=/home/$USER_NAME/application
 ENV PYTHONPATH="${PYTHONPATH}:$HOME"
 
-# Create `app` user and user's home directory
-RUN mkdir -p $APP_HOME
-RUN groupadd -g $USER_ID -r $USER_NAME && \
-    useradd -u $USER_ID -r -g $USER_NAME -d $HOME -s /sbin/nologin -c "Application user" $USER_NAME
-
 # Update system
 RUN apt-get update \
     && apt-get upgrade -y \
     && apt-get install -y gcc python3-dev libpq-dev git build-essential
 
-# Install Python, WSGI and required libraries
+# Set up virtual environment
 WORKDIR $HOME
 
-RUN python3 -m pip install --upgrade pip
 RUN python3 -m venv venv
 RUN . ./venv/bin/activate
+RUN python3 -m pip install --upgrade pip
 
+# Install uWSGI application server
 RUN pip install uwsgi
 
+# Install required application libs
 COPY ./requirements.txt $HOME
 RUN pip install -r requirements.txt
 
-# Copy application source files
+# Copy application files
+RUN mkdir -p $APP_HOME
 COPY application/ $APP_HOME
-
-# !!! FOR DEMONSTRATION PURPOSE ONLY! REMOVE IN PRODUCTION !!!
+# !!! NEXT LINE IS FOR DEMONSTRATION PURPOSE ONLY! REMOVE IN PRODUCTION !!!
 COPY .env $APP_HOME
-# !!! FOR DEMONSTRATION PURPOSE ONLY! REMOVE IN PRODUCTION !!!
 
-# Run DB migrations and create superuser
-WORKDIR $APP_HOME
-
-RUN chown -R $USER_NAME:$USER_NAME $HOME
-
-# Change user to `app`
-USER $USER_NAME
-
+# Make database migrations
 RUN python3 manage.py makemigrations
 RUN python3 manage.py migrate
 
-# !!! FOR DEMONSTRATION PURPOSE ONLY! REMOVE IN PRODUCTION !!!
+# Create superuser (REMOVE IN PRODUCTION)
+# !!! NEXT LINE IS FOR DEMONSTRATION PURPOSE ONLY! REMOVE IN PRODUCTION !!!
 COPY create_superuser.sh .
-# RUN chmod +x create_superuser.sh
-# Remove Windows characters:
+# !!! NEXT LINE IS FOR DEMONSTRATION PURPOSE ONLY! REMOVE IN PRODUCTION !!!
 RUN sed -i -e 's/\r$//' create_superuser.sh
+# !!! NEXT LINE IS FOR DEMONSTRATION PURPOSE ONLY! REMOVE IN PRODUCTION !!!
 RUN ./create_superuser.sh
-# !!! FOR DEMONSTRATION PURPOSE ONLY! REMOVE IN PRODUCTION !!!
 
-# Show port that applications listens to
+# Add `app` system user to use in Docker container
+RUN groupadd -g $USER_ID -r $USER_NAME && \
+    useradd -u $USER_ID -r -g $USER_NAME -d $HOME -s /sbin/nologin -c "Application user" $USER_NAME
+RUN chown -R $USER_NAME:$USER_NAME $HOME
+
+# Set container state before launch application
+USER $USER_NAME
+WORKDIR $APP_HOME
 EXPOSE 8000
 
 # Set command to run when container starts
-# CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
 CMD ["uwsgi", "--http", ":8000", "--module", "vehicle_manager.wsgi"]
